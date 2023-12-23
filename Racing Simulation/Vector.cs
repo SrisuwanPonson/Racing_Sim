@@ -12,6 +12,7 @@ namespace Racing_Simulation
         public double X { get; set; }
         public double Y { get; set; }
         public double Z { get; set; }
+        public bool IsRun { get; set; }
         public double Length
         {
             get
@@ -112,6 +113,10 @@ namespace Racing_Simulation
         {
             //double dotProduct = DotProduct(a, b);
             //double CosTheta = dotProduct / (a.Length * b.Length);
+            if(double.IsNaN(Math.Acos(DotProduct(a, b) / (a.Length * b.Length))))
+            {
+                return 0;
+            }
             return  Math.Acos(DotProduct(a, b) / (a.Length * b.Length));
         }
         public static double ConvertRadiansToDegrees(double radians)
@@ -120,20 +125,22 @@ namespace Racing_Simulation
             return (degrees);
         }
 
-        public void SetVelocity(double CurrentVel,double TagetVel,double Distance)
+        public void SetVelocity(double TagetVel, double InternalDelay, double TimerInterval,out int step )
         {
-            //v   = u + at
-            //v^2 = u^2 + 2*a*s
+            step= Convert.ToInt32(TagetVel* (InternalDelay + TimerInterval));
         }
-        public double GetVelocity(double MeterPerPoint,double InternalDelay,double TimerInterval)
+        
+        public double GetVelocity(int stpe,double MeterPerPoint,double InternalDelay,double TimerInterval)
         {
             double Velocity;// Km/h
-            Velocity = MeterPerPoint / (InternalDelay + TimerInterval); //Meter/mSec
+            Velocity = stpe*MeterPerPoint / (InternalDelay + TimerInterval); //Meter/mSec
             Velocity = Velocity * 1000;//Meter/Sec
             Velocity = Velocity / 1000;//Km/Sec
             Velocity = Velocity * 3600;//Km/h
             return Velocity;
         }
+
+      
         #endregion
     }
 }
