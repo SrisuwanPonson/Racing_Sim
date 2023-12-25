@@ -16,10 +16,10 @@ namespace Racing_Simulation
     {
         #region Variable
         public string Revision = "23.12.22.00";
-        Vector CarVector, PathVector,NewPathVector;
+        Vector CarVector, PathVector, NewPathVector;
         List<LineTracking> points = null;
         List<Curve> curves = null;
-       
+
         Pen bluePen = new Pen(Color.Blue, 2);
         Pen redPen = new Pen(Color.Red, 2);
         Point P = new Point(0, 0);
@@ -45,7 +45,7 @@ namespace Racing_Simulation
         public Form1()
         {
             InitializeComponent();
-            ThreadMonitorCurve= new Thread(new ThreadStart(MonitorCurve));
+            ThreadMonitorCurve = new Thread(new ThreadStart(MonitorCurve));
             CarVector = new Vector();
             PathVector = new Vector(CarVector);
             NewPathVector = new Vector(CarVector);
@@ -56,7 +56,7 @@ namespace Racing_Simulation
                                                 .Skip(0)
                     .Select(v => LineTracking.FromCsv(v))
                     .ToList();
-                
+
             }
             catch (Exception ex)
             {
@@ -66,7 +66,7 @@ namespace Racing_Simulation
             labelStatus.ForeColor = Color.Blue;
             //_meterPerPoint = 1000 / points.Count;
             labelTotalPoints.Text = points.Count.ToString();
-            labelMeterPerPoints.Text =(_meterPerPoint).ToString("F5");
+            labelMeterPerPoints.Text = (_meterPerPoint).ToString("F5");
 
 
         }
@@ -74,7 +74,7 @@ namespace Racing_Simulation
         private void MonitorCurve()
         {
             //curves = CurveSeacher(points);
-            if (curves.Count>0)
+            if (curves.Count > 0)
             {
                 while (CarVector.IsRun)
                 {
@@ -82,25 +82,25 @@ namespace Racing_Simulation
                     {
 
                     }
-                } 
+                }
             }
         }
 
         public List<Curve> CurveSeacher(List<LineTracking> loop)
         {
-            bool start,stop;
+            bool start, stop;
             start = false;
             stop = true;
             List<Curve> curves = new List<Curve>();
             Curve curve = new Curve();
             List<LineTracking> Loop = loop;
-            Coords startPoint,endPoint;
+            Coords startPoint, endPoint;
             startPoint = new Coords();
             endPoint = new Coords();
-            double count=0;
+            double count = 0;
             int startPathPoint = 0;
             int endPathPoint = 0;
-            for (int i=0;i<Loop.Count;i+=StepPerPoint)
+            for (int i = 0; i < Loop.Count; i += StepPerPoint)
             {
                 #region Car
                 try
@@ -148,10 +148,10 @@ namespace Racing_Simulation
                 if (Deg > 90)
                 {
                     Deg = Deg - 180;
-                } 
+                }
                 #endregion
 
-                if(Deg>3)
+                if (Deg > 3)
                 {
                     if (!start)
                     {
@@ -165,7 +165,7 @@ namespace Racing_Simulation
                 }
                 else
                 {
-                    if(start)
+                    if (start)
                     {
                         //endPoint = new Coords(Loop[i].Xaxis, Loop[i].Yaxis);
                         endPoint.X = Loop[i].Xaxis;
@@ -177,9 +177,9 @@ namespace Racing_Simulation
                         if (true)//50 point= 2meter/0.04
                         {
                             curve = new Curve(startPathPoint, endPathPoint, startPoint, endPoint, CalculateRadius(Loop, startPathPoint, endPathPoint));
-                            if (curve.Radius<200&&count>300)
+                            if (curve.Radius < 200 && count > 300)
                             {
-                                curves.Add(curve); 
+                                curves.Add(curve);
                             }
                             //MessageBox.Show("Radius : " + curve.Radius.ToString()); 
                         }
@@ -190,14 +190,14 @@ namespace Racing_Simulation
 
             string str = "";
             str = "Start(Point_Number),End(Point_Number),Curve_Length(Meter),Radius(Meter)" + "\n";
-            foreach(Curve item in curves)
+            foreach (Curve item in curves)
             {
-                str += item.StartPathPoint.ToString() + "," + item.EndPathPoint.ToString() + ","+((item.EndPathPoint - item.StartPathPoint)*_meterPerPoint).ToString()+"," + item.Radius.ToString()+"\n";
+                str += item.StartPathPoint.ToString() + "," + item.EndPathPoint.ToString() + "," + ((item.EndPathPoint - item.StartPathPoint) * _meterPerPoint).ToString() + "," + item.Radius.ToString() + "\n";
             }
             System.IO.File.WriteAllText("Curves.csv", str);
             return curves;
         }
-        public double CalculateRadius(List<LineTracking> loop,int start,int end)
+        public double CalculateRadius(List<LineTracking> loop, int start, int end)
         {
             int totalPoint = end - start + 1;
             double radius;
@@ -244,11 +244,11 @@ namespace Racing_Simulation
                 float dx = center.X - StartPoint.Xaxis;
                 float dy = center.Y - StartPoint.Yaxis;
                 radius = (float)Math.Sqrt(dx * dx + dy * dy);
-            } 
+            }
             #endregion
-            
 
-            return ConvertPointLength2DistanceMeter(radius,loop);
+
+            return ConvertPointLength2DistanceMeter(radius, loop);
         }
         private void FindIntersection(PointF p1, PointF p2, PointF p3, PointF p4, out bool lines_intersect, out bool segments_intersect, out PointF intersection, out PointF close_p1, out PointF close_p2)
         {
@@ -310,12 +310,12 @@ namespace Racing_Simulation
             close_p1 = new PointF(p1.X + dx12 * t1, p1.Y + dy12 * t1);
             close_p2 = new PointF(p3.X + dx34 * t2, p3.Y + dy34 * t2);
         }
-        private double ConvertPointLength2DistanceMeter(double rawlength,List<LineTracking>loop)
+        private double ConvertPointLength2DistanceMeter(double rawlength, List<LineTracking> loop)
         {
             double pointDistance;
             Vector temp = new Vector();
-            temp.X = loop[100].Xaxis- loop[0].Xaxis;
-            temp.Y = loop[100].Yaxis- loop[0].Yaxis;
+            temp.X = loop[100].Xaxis - loop[0].Xaxis;
+            temp.Y = loop[100].Yaxis - loop[0].Yaxis;
             pointDistance = temp.Length;
             pointDistance /= 100;
             double MeterPerPointLength = _meterPerPoint / pointDistance;
@@ -343,7 +343,7 @@ namespace Racing_Simulation
                 e.Graphics.DrawLine(bluePen, x1, y1, x2, y2);
 
             }
-            if(/*EnableUpdateMarkRed*/true)
+            if (/*EnableUpdateMarkRed*/true)
             {
                 try
                 {
@@ -354,9 +354,9 @@ namespace Racing_Simulation
                         {
                             x1 = points[i].Xaxis;
                             y1 = points[i].Yaxis;
-                            x2 = points[i+1].Xaxis;
-                            y2 = points[i+1].Yaxis;
-                            e.Graphics.DrawLine(redPen, x1, y1, x2, y2); 
+                            x2 = points[i + 1].Xaxis;
+                            y2 = points[i + 1].Yaxis;
+                            e.Graphics.DrawLine(redPen, x1, y1, x2, y2);
                         }
                         //x1 = points[curve.StartPathPoint].Xaxis;
                         //y1 = points[curve.StartPathPoint].Yaxis;
@@ -374,19 +374,19 @@ namespace Racing_Simulation
             }
 
         }
-        public void UpdatePath(List<LineTracking> path,string FileName)
+        public void UpdatePath(List<LineTracking> path, string FileName)
         {
             string data = null;
-            for(int i=0;i<path.Count;i++)
+            for (int i = 0; i < path.Count; i++)
             {
                 data += path[i].Xaxis.ToString() + "," + path[i].Yaxis.ToString() + "\n";
             }
             System.IO.File.WriteAllText(FileName, data);
         }
-        
+
         private void btnAcc_Click(object sender, EventArgs e)
         {
-            
+
             labelStatus.Text = "VEL UP";
             labelStatus.ForeColor = Color.Red;
         }
@@ -394,7 +394,7 @@ namespace Racing_Simulation
         private void timer1_Tick(object sender, EventArgs e)
         {
             //double Velocity = (_pointPerStep * 1000 / timer1.Interval);
-           
+
             //belVel.Text = (Velocity*_meterPerPoint*3.6).ToString("F2");
 
             if (_enableSteering)
@@ -406,8 +406,8 @@ namespace Racing_Simulation
                 //i = 20000;
                 if (i < points.Count - _pointPerStep/*22000*/)
                 {
-                    P.X = offsetX + Convert.ToInt32(points[i+1].Xaxis);
-                    P.Y = offsetY + Convert.ToInt32(points[i+ 1].Yaxis);
+                    P.X = offsetX + Convert.ToInt32(points[i + 1].Xaxis);
+                    P.Y = offsetY + Convert.ToInt32(points[i + 1].Yaxis);
                     car.Location = P;
 
                     #region Update Current Locatio
@@ -415,7 +415,7 @@ namespace Racing_Simulation
                     labelLocationY.Text = points[i].Yaxis.ToString();
                     try
                     {
-                        if(i==0)
+                        if (i == 0)
                         {
                             CarVector.X = points[i].Xaxis - points[i + 24].Xaxis;//48 points =2 meter
                             CarVector.Y = points[i].Yaxis - points[i + 24].Yaxis;//48 points =2 meter
@@ -425,7 +425,7 @@ namespace Racing_Simulation
                             CarVector.X = points[i].Xaxis - points[i - 24].Xaxis;//24 points =1 meter
                             CarVector.Y = points[i].Yaxis - points[i - 24].Yaxis;//24 points =1 meter
                         }
-                        
+
                         CarVector.Uniteze();
                         //labelCarVector.Text = CarVector.ToString();
                     }
@@ -436,7 +436,7 @@ namespace Racing_Simulation
                     }
                     try
                     {
-                       
+
                         PathVector.X = points[i + 12].Xaxis - points[i].Xaxis;//12 points = 0.25 meter
                         PathVector.Y = points[i + 12].Yaxis - points[i].Yaxis;//12 points = 0.25 meter
                         PathVector.Uniteze();
@@ -452,7 +452,7 @@ namespace Racing_Simulation
                         double angle_rads = Vector.GetAngle(PathVector, CarVector);
 
                         double Deg = Vector.ConvertRadiansToDegrees(angle_rads);
-                        if(Deg>90)
+                        if (Deg > 90)
                         {
                             Deg = Deg - 180;
                         }
@@ -462,42 +462,42 @@ namespace Racing_Simulation
                             if (Deg > 7) //7*5
                             {
                                 points[i].Xaxis = (points[i + 15].Xaxis + points[i + 14].Xaxis + points[i + 13].Xaxis + points[i + 12].Xaxis + points[i + 11].Xaxis +
-                                                points[i + 10].Xaxis + points[i + 9].Xaxis + points[i + 8].Xaxis + points[i + 7].Xaxis + points[i + 6].Xaxis+
+                                                points[i + 10].Xaxis + points[i + 9].Xaxis + points[i + 8].Xaxis + points[i + 7].Xaxis + points[i + 6].Xaxis +
                                                    points[i + 5].Xaxis + points[i + 4].Xaxis + points[i + 3].Xaxis + points[i + 2].Xaxis + points[i + 1].Xaxis
                                                  + points[i - 1].Xaxis + points[i - 2].Xaxis + points[i - 3].Xaxis + points[i - 4].Xaxis + points[i - 5].Xaxis
                                                  + points[i - 6].Xaxis + points[i - 7].Xaxis + points[i - 8].Xaxis + points[i - 9].Xaxis + points[i - 10].Xaxis
                                                  + points[i - 11].Xaxis + points[i - 12].Xaxis + points[i - 13].Xaxis + points[i - 14].Xaxis + points[i - 15].Xaxis) / 30;
 
                                 points[i].Yaxis = (points[i + 15].Yaxis + points[i + 14].Yaxis + points[i + 13].Yaxis + points[i + 12].Yaxis + points[i + 11].Yaxis +
-                                                points[i + 10].Yaxis + points[i + 9].Yaxis + points[i + 8].Yaxis + points[i + 7].Yaxis + points[i + 6].Yaxis+
+                                                points[i + 10].Yaxis + points[i + 9].Yaxis + points[i + 8].Yaxis + points[i + 7].Yaxis + points[i + 6].Yaxis +
                                                    points[i + 5].Yaxis + points[i + 4].Yaxis + points[i + 3].Yaxis + points[i + 2].Yaxis + points[i + 1].Yaxis
                                                   + points[i - 1].Yaxis + points[i - 2].Yaxis + points[i - 3].Yaxis + points[i - 4].Yaxis + points[i - 5].Yaxis
                                                   + points[i - 6].Yaxis + points[i - 7].Yaxis + points[i - 8].Yaxis + points[i - 9].Yaxis + points[i - 10].Yaxis
                                                   + points[i - 11].Yaxis + points[i - 12].Yaxis + points[i - 13].Yaxis + points[i - 14].Yaxis + points[i - 15].Yaxis) / 30;
-                             
-                            } 
+
+                            }
                             else
                             {
-                                
+
                             }
                         }
-                       
-                        if (Deg>90)
+
+                        if (Deg > 90)
                         {
-                            anglePoint += 0.ToString() + "\n"; 
+                            anglePoint += 0.ToString() + "\n";
                         }
                         else
                         {
                             anglePoint += Deg.ToString() + "\n";
                         }
 
-                    
+
 
 
                         labelAngle.Text = Deg.ToString("F2");
-                        if(Deg>MaxDegree)
+                        if (Deg > MaxDegree)
                         {
-                            MaxDegree = Math.Round(Deg,5);
+                            MaxDegree = Math.Round(Deg, 5);
                             labelMaxDegreePoint.Text = i.ToString();
                         }
                         labelVel.Text = CarVector.GetVelocity(StepPerPoint, _meterPerPoint, InternalDelay, timer1.Interval).ToString("F2");
@@ -544,7 +544,7 @@ namespace Racing_Simulation
                       .ToList();
                         this.Invalidate();
                         System.IO.File.WriteAllText("angle.csv", anglePoint);
-                        anglePoint = ""; 
+                        anglePoint = "";
                     }
                 }
 
@@ -567,7 +567,7 @@ namespace Racing_Simulation
             {
                 return;
             }
-            
+
             EnableUpdateMarkRed = true;
             this.Invalidate();
             if (ThreadMonitorCurve != null)
@@ -599,7 +599,7 @@ namespace Racing_Simulation
             CurveSeacher(points);
         }
 
-        
+
 
         private void btnAcc_MouseDown(object sender, MouseEventArgs e)
         {
@@ -643,7 +643,7 @@ namespace Racing_Simulation
             float x1 = 20.0F, y1 = 20.0F;
             float x2 = 200.0F, y2 = 20.0F;
 
-           
+
             this.Invalidate();
         }
 
@@ -681,13 +681,13 @@ namespace Racing_Simulation
             #endregion
 
             #region Save to CSV
-            UpdatePath(points, "coordinates_v2_2.csv"); 
+            UpdatePath(points, "coordinates_v2_2.csv");
             #endregion
 
             Thread.Sleep(1000);
-            
 
-        
+
+
 
         }
 
@@ -717,7 +717,7 @@ namespace Racing_Simulation
             timer1.Enabled = false;
             labelStatus.Text = "STOP";
             labelStatus.ForeColor = Color.Red;
-        } 
+        }
         #endregion
 
     }
